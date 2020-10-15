@@ -22,29 +22,24 @@ namespace WebCrawler
             int numHops = int.Parse(args[1]);
             String currentURL = args[0]; //"http://courses.washington.edu/css342/dimpsey";
             Dictionary<string, int> visitedURLs = new Dictionary<string, int>();
-
-            for(int i = 0; i < numHops + 1; i++)
-            {
-                string previousURL = currentURL;
-                // Console.WriteLine(currentURL);
-                // Console.WriteLine("Current Hop: " + i);
-                currentURL = getNextHop(currentURL, visitedURLs);
-                if(currentURL == null)
-                {
-                    Console.WriteLine("No more accessible references");
-                    currentURL = previousURL;
-                    break;
-                }
-            }
             
-            Console.WriteLine(currentURL);
-            Console.WriteLine(getLastHopHTML(currentURL));
+            if(!getNextHop(currentURL, numHops, 0, visitedURLs))
+            {
+                Console.WriteLine("Didn't find max hop link");
+                Console.WriteLine(currentURL);
+                Console.WriteLine(getLastHopHTML(currentURL));
+            }
         }
 
-        static string getNextHop(string url, Dictionary<string, int> visitedURLs){
+        static Boolean getNextHop(string url, int maxHops, int currentHops, Dictionary<string, int> visitedURLs){
+            if(currentHops >= maxHops)
+            {
+                Console.WriteLine(getLastHopHTML(url));
+                return true;
+            }
+            
             using(var client = new HttpClient(new HttpClientHandler {AutomaticDecompression = System.Net.DecompressionMethods.GZip | DecompressionMethods.Deflate}))
             {
-                // client.BaseAddress = new Uri(url);
                 HttpResponseMessage response = client.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
                 string result = response.Content.ReadAsStringAsync().Result;
@@ -59,20 +54,25 @@ namespace WebCrawler
                     {
                         if(aLine.Contains("href"))
                         {
-                            if(!(visitedURLs.ContainsKey(aLine)))
+                            int linkStart = aLine.IndexOf("href=\"") + 6;
+                            int linkEnd = aLine.IndexOf("\"", linkStart);
+                            string link = aLine.Substring(linkStart, linkEnd - linkStart);
+                            if(link.Contains("http://") || link.Contains("https://"))
                             {
-                                // 400 is skipped next
-                                // is regex better than string parsing?
-                                // Backtracking?
-                                visitedURLs.Add(aLine, 1);
-                                //Console.WriteLine(aLine);
-                                int linkStart = aLine.IndexOf("href=\"") + 6;
-                                int linkEnd = aLine.IndexOf("\"", linkStart);
-                                string link = aLine.Substring(linkStart, linkEnd - linkStart);
-                                //Console.WriteLine("link: " + link);
-                                if(link.Contains("http://") || link.Contains("https://"))
+                                if(!visitedURLs.ContainsKey(link))
                                 {
-                                    return link;
+                                    Console.WriteLine("Current Hop: " + currentHops);
+                                    Console.WriteLine("Current URL: " + link);
+                                    visitedURLs.Add(link, 1);
+                                    if(getNextHop(link, maxHops, currentHops + 1, visitedURLs))
+                                    {
+                                        Console.WriteLine("Visited: " + link);
+                                        return true;
+                                    }
+                                    else if(!getNextHop(link, maxHops, currentHops + 1, visitedURLs))
+                                    {
+                                        visitedURLs.Remove(link);
+                                    }
                                 }
                             }
                         }
@@ -82,7 +82,7 @@ namespace WebCrawler
                         break;
                     }
                 }
-                return null;
+                return false;
             }
         }
 
