@@ -41,8 +41,18 @@ namespace WebCrawler
             using(var client = new HttpClient(new HttpClientHandler {AutomaticDecompression = System.Net.DecompressionMethods.GZip | DecompressionMethods.Deflate}))
             {
                 HttpResponseMessage response = client.GetAsync(url).Result;
-                response.EnsureSuccessStatusCode();
+                if(!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Failed");
+                    Console.WriteLine((int)response.StatusCode);
+                }
+                else
+                {
+                    Console.WriteLine("Passed!");
+                    Console.WriteLine((int)response.StatusCode);
+                }
                 string result = response.Content.ReadAsStringAsync().Result;
+                
 
                 StringReader strReader = new StringReader(result);
                 string aLine = "";
@@ -56,6 +66,7 @@ namespace WebCrawler
                         {
                             int linkStart = aLine.IndexOf("href=\"") + 6;
                             int linkEnd = aLine.IndexOf("\"", linkStart);
+                            Console.WriteLine(aLine);
                             string link = aLine.Substring(linkStart, linkEnd - linkStart);
                             link = cleanupUrl(link);
                             
