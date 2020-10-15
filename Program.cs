@@ -45,6 +45,36 @@ namespace WebCrawler
                 {
                     Console.WriteLine("Failed");
                     Console.WriteLine((int)response.StatusCode);
+
+                    int statusCode = (int)response.StatusCode;
+
+                    if( statusCode >= 400 && statusCode < 500)
+                    {
+                        Console.WriteLine("Error " + statusCode);
+                        return false;
+                    }
+                    else if(statusCode >= 500 && statusCode < 600)
+                    {
+                        Console.WriteLine("Error " + statusCode);
+                        bool is500RetrySucceed = false;
+
+                        for(int i = 0; i < 3; i++)
+                        {
+                            HttpResponseMessage retryResponse = client.GetAsync(url).Result;
+
+                            statusCode = (int)retryResponse.StatusCode;
+                            if(statusCode < 500 && statusCode >= 600)
+                            {
+                                is500RetrySucceed = true;
+                                break;
+                            }
+                        }
+
+                        if(!is500RetrySucceed)
+                        {
+                            return false;
+                        }
+                    }
                 }
                 else
                 {
@@ -68,10 +98,11 @@ namespace WebCrawler
                             int linkEnd = aLine.IndexOf("\"", linkStart);
                             Console.WriteLine(aLine);
                             string link = aLine.Substring(linkStart, linkEnd - linkStart);
-                            link = cleanupUrl(link);
                             
                             if(link.Contains("http://") || link.Contains("https://"))
                             {
+                                link = cleanupUrl(link);
+                                
                                 if(!visitedURLs.ContainsKey(link))
                                 {
                                     Console.WriteLine("Current Hop: " + currentHops);
@@ -109,6 +140,7 @@ namespace WebCrawler
         }
 
         static string cleanupUrl(string url){
+            Console.WriteLine(url.Length);
             if(url.Substring(url.Length - 2, 1) == "/")
             {
                 return url.Substring(0, url.Length - 1);
