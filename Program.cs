@@ -72,6 +72,7 @@ namespace WebCrawler
                                 //Console.WriteLine("link: " + link);
                                 if(link.Contains("http://") || link.Contains("https://"))
                                 {
+                                    Console.WriteLine("Visited: " + link);
                                     return link;
                                 }
                             }
