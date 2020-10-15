@@ -32,7 +32,7 @@ namespace WebCrawler
         }
 
         static Boolean getNextHop(string url, int maxHops, int currentHops, Dictionary<string, int> visitedURLs){
-            if(currentHops >= maxHops)
+            if(currentHops > maxHops)
             {
                 Console.WriteLine(getLastHopHTML(url));
                 return true;
@@ -57,6 +57,8 @@ namespace WebCrawler
                             int linkStart = aLine.IndexOf("href=\"") + 6;
                             int linkEnd = aLine.IndexOf("\"", linkStart);
                             string link = aLine.Substring(linkStart, linkEnd - linkStart);
+                            link = cleanupUrl(link);
+                            
                             if(link.Contains("http://") || link.Contains("https://"))
                             {
                                 if(!visitedURLs.ContainsKey(link))
@@ -93,6 +95,15 @@ namespace WebCrawler
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
             }
+        }
+
+        static string cleanupUrl(string url){
+            if(url.Substring(url.Length - 2, 1) == "/")
+            {
+                return url.Substring(0, url.Length - 1);
+            }
+
+            return url;
         }
     }
 }
