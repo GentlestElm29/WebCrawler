@@ -128,7 +128,7 @@ namespace WebCrawler
                             // Find the link start and end index to get the link inside href
                             int linkStart = aLine.IndexOf("href=\"") + 6;
                             int linkEnd = aLine.IndexOf("\"", linkStart);
-                            //Console.WriteLine(aLine);
+                            //Console.WriteLine(aLine); //debugging purposes
                             string link = aLine.Substring(linkStart, linkEnd - linkStart);
 
                             // Find the line that contains http://

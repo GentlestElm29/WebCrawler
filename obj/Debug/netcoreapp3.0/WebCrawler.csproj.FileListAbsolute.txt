@@ -1,0 +1,11 @@
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.exe
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.deps.json
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.runtimeconfig.json
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.runtimeconfig.dev.json
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.dll
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\bin\Debug\netcoreapp3.0\WebCrawler.pdb
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\obj\Debug\netcoreapp3.0\WebCrawler.csprojAssemblyReference.cache
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\obj\Debug\netcoreapp3.0\WebCrawler.AssemblyInfoInputs.cache
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\obj\Debug\netcoreapp3.0\WebCrawler.AssemblyInfo.cs
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\obj\Debug\netcoreapp3.0\WebCrawler.dll
+C:\Users\treoe\Documents\Cloud Computing\repos\WebCrawler\obj\Debug\netcoreapp3.0\WebCrawler.pdb
