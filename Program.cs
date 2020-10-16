@@ -108,62 +108,53 @@ namespace WebCrawler
                 // This retrieves the HTML of the page
 
                 string result = response.Content.ReadAsStringAsync().Result;
-
-                // I chose StringReader to be able to read the HTML lines as strings
-                StringReader strReader = new StringReader(result);
-                string aLine = "";
+                int currentPosition = 0;
 
                 // This is a continous while loop since we don't always know the length of the HTML of the page
                 while (true)
                 {
                     // We retrieve the line of HTML
-                    aLine = strReader.ReadLine();
+                    int linkStartIndex = result.IndexOf("href=\"", currentPosition);
 
-                    // If null, it means we reached end of HTML
-                    if (aLine != null)
-                    {
-                        // We keep going through the HTML until we find the line containing href 
-                        if (aLine.Contains("href"))
-                        {
-                            // Find the link start and end index to get the link inside href
-                            int linkStart = aLine.IndexOf("href=\"") + 6;
-                            int linkEnd = aLine.IndexOf("\"", linkStart);
-                            //Console.WriteLine(aLine); //debugging purposes
-                            string link = aLine.Substring(linkStart, linkEnd - linkStart);
-
-                            // Find the line that contains http://
-                            if (link.Contains("http://") || link.Contains("https://"))
-                            {
-                                // This call is to clean up the backslash as we treat both urls with or without backslash the same
-                                link = cleanupUrl(link);
-
-                                // If url isn't in dictionary, meaning we haven't visited, then we will enter the url
-                                if (!visitedURLs.ContainsKey(link))
-                                {
-                                    // Console.WriteLine("Current Hop: " + currentHops);
-                                    // Console.WriteLine("Current URL: " + link);
-                                    // upon visiting, we will add the link into dictionary to not visit it again
-                                    visitedURLs.Add(link, 1);
-
-                                    // Recursive call through the urls to hop as many times as needed
-                                    if (getNextHop(link, maxHops, currentHops + 1, visitedURLs))
-                                    {
-                                        //Console.WriteLine("Visited: " + link);
-                                        return true;
-                                    }
-                                    // If we get to a dead end, we remove link and backtrack
-                                    else if (!getNextHop(link, maxHops, currentHops + 1, visitedURLs))
-                                    {
-                                        visitedURLs.Remove(link);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // This is to exit while loop once we reach end of HTML 
-                    else
+                    if (linkStartIndex == -1)
                     {
                         break;
+                    }
+
+                    // We keep going through the HTML until we find the line containing href 
+                    // Find the link start and end index to get the link inside href
+                    int linkStart = 6 + linkStartIndex;
+                    int linkEnd = result.IndexOf("\"", linkStart);
+                    string link = result.Substring(linkStart, linkEnd - linkStart);
+                        
+                    currentPosition = linkEnd + 1;
+
+                    // Find the line that contains http://
+                    if (link.Contains("http://") || link.Contains("https://"))
+                    {
+                        // This call is to clean up the backslash as we treat both urls with or without backslash the same
+                        link = cleanupUrl(link);
+
+                        // If url isn't in dictionary, meaning we haven't visited, then we will enter the url
+                        if (!visitedURLs.ContainsKey(link))
+                        {
+                            // Console.WriteLine("Current Hop: " + currentHops);
+                            // Console.WriteLine("Current URL: " + link);
+                            // upon visiting, we will add the link into dictionary to not visit it again
+                            visitedURLs.Add(link, 1);
+
+                            // Recursive call through the urls to hop as many times as needed
+                            if (getNextHop(link, maxHops, currentHops + 1, visitedURLs))
+                            {
+                                //Console.WriteLine("Visited: " + link);
+                                return true;
+                            }
+                            // If we get to a dead end, we remove link and backtrack
+                            else if (!getNextHop(link, maxHops, currentHops + 1, visitedURLs))
+                            {
+                                visitedURLs.Remove(link);
+                            }
+                        }
                     }
                 }
 
